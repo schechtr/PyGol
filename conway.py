@@ -47,10 +47,10 @@ class Population:
                 self.cell_array[row].append(0)
 
 
+    # TODO: needs optimization
     def clearCells(self):
-          for row in self.cell_array:
-            for cell in row:
-                cell = 0   
+        self.cell_array = []
+        self.setupCells()
 
 
     def touchCell(self, x, y):
@@ -184,8 +184,8 @@ def main():
             if event.type == KEYDOWN:
                 if event.key == K_SPACE:
                     paused = not paused
-                #if event.key == K_f:
-                #    population.clearCells()
+                if event.key == K_f:
+                    population.clearCells()
             if event.type == USEREVENT and paused == False:
                 population.nextGeneration()
 
