@@ -7,23 +7,20 @@ class Grid:
         self.surface = surface
         self.height = height
         self.width = width
-        self.spacing = 10
+        self.spacing = 15
         self.rows = height // self.spacing
         self.columns = width // self.spacing
 
 
     def drawGrid(self):
-
         x = 0
         y = 0
         for c in range(self.columns):
-
             x = x + self.spacing
             y = y + self.spacing
 
-            pygame.draw.line(self.surface, (0, 0, 0), (x, 0), (x, self.height))
-            pygame.draw.line(self.surface, (0, 0, 0), (0, y), (self.width, y))
-
+            pygame.draw.line(self.surface, (128, 128, 128), (x, 0), (x, self.height))
+            pygame.draw.line(self.surface, (128, 128, 128), (0, y), (self.width, y))
 
     def redraw(self):
         self.surface.fill((255, 255, 255))
@@ -121,6 +118,19 @@ class Population:
                     pygame.display.update()
         
 
+def displayStats(surface, population):
+    
+    count = population.count()
+
+    surface.fill((255, 255, 255), (340, 10, 125, 20))
+
+    font = pygame.font.Font(None, 24)
+    text = font.render("population: " + str(count), 1, (0, 0, 0))
+    surface.blit(text, (340, 10))
+    pygame.display.update()
+
+
+
 
 def main():
     height = 360
@@ -163,6 +173,7 @@ def main():
         
         grid.redraw()
         population.draw()
+        displayStats(window, population)
         
 
 if __name__ == "__main__":
