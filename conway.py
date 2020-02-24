@@ -2,14 +2,15 @@ import pygame
 
 
 class Grid:
-
+    # class that draws the grid and maintains info on its attributes
     def __init__(self, surface, height, width):
         self.surface = surface
         self.height = height
         self.width = width
-        self.spacing = 30
+        self.spacing = 10
         self.rows = height // self.spacing
         self.columns = width // self.spacing
+
 
     def drawGrid(self):
 
@@ -23,6 +24,7 @@ class Grid:
             pygame.draw.line(self.surface, (0, 0, 0), (x, 0), (x, self.height))
             pygame.draw.line(self.surface, (0, 0, 0), (0, y), (self.width, y))
 
+
     def redraw(self):
         self.surface.fill((255, 255, 255))
         self.drawGrid()
@@ -35,37 +37,70 @@ class Population:
     def __init__(self, grid):
         self.grid = grid
         self.cell_array = []
-        self.clearCells()
+        self.setupCells()
+
+
+    def setupCells(self):
+        # the cell array has an extra hidden border of dead cells
+        for row in range(self.grid.rows+2):
+            self.cell_array.append([])
+            for col in range(self.grid.columns+2):
+                self.cell_array[row].append(0)
+
 
     def clearCells(self):
-        for row in range(self.grid.rows):
-            self.cell_array.append([])
-            for col in range(self.grid.columns):
-                self.cell_array[row].append(0)
+          for row in self.cell_array:
+            for cell in row:
+                cell = 0   
+
 
     def touchCell(self, x, y):
 
-        col = x // self.grid.spacing
-        row = y // self.grid.spacing 
+        col = x // self.grid.spacing + 1
+        row = y // self.grid.spacing + 1
 
         alive = self.cell_array[row][col]
         if not alive:
-            self.cell_array[row][col] = 1
+            self.birthCell(row, col)
         '''else:
             self.cell_array[row][col] = 0
         '''
+        #print(self.count_neighbors(y, x))
+        #print(self.cell_array)
+        #print(row, col)
 
-    def draw(self):
-        spacing = self.grid.spacing
+
+    def killCell(self, row, col):
+        self.cell_array[row][col] = 0
+
+
+    def birthCell(self, row, col):
+        self.cell_array[row][col] = 1   
+    
+
+    def nextGeneration(self):
         for row in range(self.grid.rows):
             for col in range(self.grid.columns):   
-                if self.cell_array[row][col] == 1:
-                    cell_rect = (col * spacing, row * spacing, spacing, spacing)
-                    self.grid.surface.fill((0, 0, 0), cell_rect)
-                    #pygame.draw.rect(self.grid.surface, (0, 0, 0), cell_rect)
-                    pygame.display.update()
-                
-    
+                neighbors = self.countNeighbors(row+1, col+1)
+
+                # if fewer than two neighbors or more than three cell dies
+                if neighbors < 2 or neighbors > 3:
+                    self.killCell(row+1, col+1)
+                # if exactly three neighbors cell is created
+                elif neighbors == 3:
+                    self.birthCell(row+1, col+1)
+               
+
+    def countNeighbors(self, row, col):
+        count = 0
+        for i in range(row-1, row+2):
+            for j in range(col-1, col+2):
+                if self.cell_array[i][j] == 1 and (i != row or j != col):
+                    count += 1
+        
+        return count
+
+
     def count(self):
         count = 0
         for row in self.cell_array:
@@ -75,8 +110,16 @@ class Population:
     
         return count   
 
-        
 
+    def draw(self):
+        spacing = self.grid.spacing
+        for row in range(self.grid.rows):
+            for col in range(self.grid.columns):   
+                if self.cell_array[row+1][col+1] == 1:
+                    cell_rect = (col * spacing, row * spacing, spacing, spacing)
+                    self.grid.surface.fill((0, 0, 0), cell_rect)
+                    pygame.display.update()
+        
 
 
 def main():
@@ -84,6 +127,7 @@ def main():
     width = 480
 
     pygame.init()
+    pygame.display.set_caption('pyGol')
     
     # create window 
     window = pygame.display.set_mode((width, height))
@@ -91,6 +135,7 @@ def main():
     population = Population(grid)
     
     clock = pygame.time.Clock()
+    pygame.time.set_timer(pygame.USEREVENT, 1000)
 
     done = False
     mouse_being_pressed = False
@@ -109,10 +154,13 @@ def main():
             elif mouse_being_pressed:
                 x, y = pygame.mouse.get_pos()
                 population.touchCell(x, y)
+            if event.type == pygame.USEREVENT:
+                population.nextGeneration()
 
         
         #pygame.time.delay(50)
-        clock.tick(60)
+        #clock.tick(10)
+        
         grid.redraw()
         population.draw()
         
