@@ -111,7 +111,7 @@ class Population:
                     pygame.display.update()
         
 
-def displayStats(surface, population):
+def displayStats(surface, population, paused):
     
     count = population.count()
 
@@ -120,6 +120,12 @@ def displayStats(surface, population):
     font = pygame.font.Font(None, 24)
     text = font.render("population: " + str(count), 1, (0, 0, 0))
     surface.blit(text, (340, 10))
+
+    if paused:
+        surface.fill((255, 255, 255), (340, 40, 60, 20))
+        text = font.render("paused", 1, (0, 0, 0))
+        surface.blit(text, (340, 40))
+
     pygame.display.update()
 
 
@@ -141,6 +147,7 @@ def main():
     pygame.time.set_timer(USEREVENT, 1000)
 
     done = False
+    paused = False
     mouse_being_pressed = False
     while not done:
 
@@ -157,7 +164,10 @@ def main():
             elif mouse_being_pressed:
                 x, y = pygame.mouse.get_pos()
                 population.touchCell(x, y)
-            if event.type == USEREVENT:
+            if event.type == KEYDOWN:
+                if event.key == K_SPACE:
+                    paused = not paused
+            if event.type == USEREVENT and paused == False:
                 population.nextGeneration()
 
         
@@ -165,7 +175,7 @@ def main():
 
         grid.redraw()
         population.draw()
-        displayStats(window, population)
+        displayStats(window, population, paused)
         
 
 if __name__ == "__main__":
