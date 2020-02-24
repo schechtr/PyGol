@@ -35,6 +35,8 @@ class Population:
         self.grid = grid
         self.cell_array = []
         self.setupCells()
+        self.kill_list = []
+        self.birth_list = []
 
 
     def setupCells(self):
@@ -67,18 +69,32 @@ class Population:
     def birthCell(self, row, col):
         self.cell_array[row][col] = 1   
     
-
+    def alive(self, row, col): return self.cell_array[row][col]
+    
+    # TODO: needs optimization
     def nextGeneration(self):
+        # survey the cell array
         for row in range(self.grid.rows):
             for col in range(self.grid.columns):   
                 neighbors = self.countNeighbors(row+1, col+1)
 
                 # if fewer than two neighbors or more than three cell dies
-                if neighbors < 2 or neighbors > 3:
-                    self.killCell(row+1, col+1)
+                if self.alive(row+1, col+1):
+                    if neighbors < 2 or neighbors > 3:
+                        self.kill_list.append((row+1, col+1))
+
                 # if exactly three neighbors cell is created
                 elif neighbors == 3:
-                    self.birthCell(row+1, col+1)
+                    self.birth_list.append((row+1, col+1))
+
+        # carry out actions
+        for row, col in self.kill_list:
+            self.killCell(row, col)
+        for row, col in self.birth_list:
+            self.birthCell(row, col)
+        # reset lists
+        self.kill_list.clear()
+        self.birth_list.clear()
                
 
     def countNeighbors(self, row, col):
@@ -87,7 +103,7 @@ class Population:
             for j in range(col-1, col+2):
                 if self.cell_array[i][j] == 1 and (i != row or j != col):
                     count += 1
-        
+
         return count
 
 
@@ -151,6 +167,7 @@ def main():
     mouse_being_pressed = False
     while not done:
 
+        # handle events
         for event in pygame.event.get():
             if event.type == QUIT:
                 done = True
@@ -167,12 +184,15 @@ def main():
             if event.type == KEYDOWN:
                 if event.key == K_SPACE:
                     paused = not paused
+                #if event.key == K_f:
+                #    population.clearCells()
             if event.type == USEREVENT and paused == False:
                 population.nextGeneration()
 
         
         #clock.tick(60)
 
+        # update game
         grid.redraw()
         population.draw()
         displayStats(window, population, paused)
