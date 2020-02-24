@@ -1,5 +1,5 @@
 import pygame
-
+from pygame.locals import *
 
 class Grid:
     # class that draws the grid and maintains info on its attributes
@@ -59,13 +59,6 @@ class Population:
         alive = self.cell_array[row][col]
         if not alive:
             self.birthCell(row, col)
-        '''else:
-            self.cell_array[row][col] = 0
-        '''
-        #print(self.count_neighbors(y, x))
-        #print(self.cell_array)
-        #print(row, col)
-
 
     def killCell(self, row, col):
         self.cell_array[row][col] = 0
@@ -145,32 +138,31 @@ def main():
     population = Population(grid)
     
     clock = pygame.time.Clock()
-    pygame.time.set_timer(pygame.USEREVENT, 1000)
+    pygame.time.set_timer(USEREVENT, 1000)
 
     done = False
     mouse_being_pressed = False
     while not done:
 
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type == QUIT:
                 done = True
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == MOUSEBUTTONDOWN:
                 mouse_being_pressed = True
-            if event.type == pygame.MOUSEBUTTONUP:
+            if event.type == MOUSEBUTTONUP:
                 mouse_being_pressed = False
-            if event.type == pygame.MOUSEMOTION and mouse_being_pressed == True:
+            if event.type == MOUSEMOTION and mouse_being_pressed == True:
                 x, y = pygame.mouse.get_pos()
                 population.touchCell(x, y)
             elif mouse_being_pressed:
                 x, y = pygame.mouse.get_pos()
                 population.touchCell(x, y)
-            if event.type == pygame.USEREVENT:
+            if event.type == USEREVENT:
                 population.nextGeneration()
 
         
-        #pygame.time.delay(50)
-        #clock.tick(10)
-        
+        #clock.tick(60)
+
         grid.redraw()
         population.draw()
         displayStats(window, population)
