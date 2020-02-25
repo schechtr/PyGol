@@ -10,14 +10,22 @@ The game is governed by three rules:
 * Any dead cell with three live neighbors becomes a live cell.
 * All other live cells die in the next generation. 
 
-#### Controls
-* **spacebar** - pauses/unpauses the game
-* **f** - clears the board
+### Getting Started
 
-### Dependencies
+#### Prerequisites
   * Pygame
   * Python 3.x
   
+#### Running The Game
+clone the repo and navigate to its directory
+
+run ```python3 conway.py ```
+
+#### Controls
+* **spacebar** - pauses/unpauses the game
+* **f** - clears the board
+* click and drag to add cells - easiest while the game is paused
+
 ### Authors
 * **Andrew Schechter**
   
