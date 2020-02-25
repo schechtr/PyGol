@@ -10,6 +10,8 @@ The game is governed by three rules:
 * Any dead cell with three live neighbors becomes a live cell.
 * All other live cells die in the next generation. 
 
+![Gosper Glider Gun](demo/gosper.gif)
+
 ### Getting Started
 
 #### Prerequisites
